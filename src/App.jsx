@@ -309,7 +309,7 @@ export default function App() {
           <h2 id="h-g">Grup</h2>
           <dl>
             <dt>Kadro</dt><dd data-scr>eren, doa, mustafa</dd>
-            <dt>Görüntülenme</dt><dd id="views" ref={viewsRef}>58268</dd>
+            <dt>Görüntülenme</dt><dd id="views" ref={viewsRef}></dd>
           </dl>
           <p className="links">
             <a href="https://open.spotify.com/artist/5wR7ZD67JNA7TYsiycE32o" target="_blank" rel="noopener"><svg className="ic" aria-hidden="true"><use href="/icons.svg#spotify-icon" /></svg><span>Spotify</span></a>
