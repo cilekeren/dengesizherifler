@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react'
 import './index.css'
 import logoUrl from './assets/logo.png'
 import arsivUrl from './assets/arsiv.png'
+import bandUrl from './assets/band.webp'
 
 const FONT = '"Archivo", Helvetica, Arial, sans-serif'
 const PAL = ['#000000', '#800000', '#008000', '#808000', '#000080', '#800080', '#008080', '#c0c0c0', '#808080', '#ff0000', '#00ff00', '#ffff00', '#0000ff', '#ff00ff', '#00ffff', '#ffffff']
@@ -26,6 +27,7 @@ export default function App() {
   const rootRef = useRef(null)
   const heroRef = useRef(null)
   const fxRef = useRef(null)
+  const logoRef = useRef(null)
   const tcRef = useRef(null)
   const viewsRef = useRef(null)
   const rowRefs = useRef([])
@@ -35,8 +37,10 @@ export default function App() {
     const root = rootRef.current
     const hero = heroRef.current
     const fx = fxRef.current
+    const logoCv = logoRef.current
     const hx = hero.getContext('2d')
     const fc = fx.getContext('2d')
+    const lgx = logoCv.getContext('2d')
 
     const RM = matchMedia('(prefers-reduced-motion: reduce)').matches
     const COARSE = matchMedia('(pointer: coarse)').matches
@@ -54,8 +58,8 @@ export default function App() {
 
     function size() {
       W = Math.max(2, Math.round(innerWidth * S)); H = Math.max(2, Math.round(innerHeight * S))
-      hero.width = fx.width = buf.width = W; hero.height = fx.height = buf.height = H
-      hx.imageSmoothingEnabled = fc.imageSmoothingEnabled = false
+      hero.width = fx.width = buf.width = logoCv.width = W; hero.height = fx.height = buf.height = logoCv.height = H
+      hx.imageSmoothingEnabled = fc.imageSmoothingEnabled = lgx.imageSmoothingEnabled = false
       hx.fillStyle = BASE; hx.fillRect(0, 0, W, H)
       cache = {}; mainTex = logoTex(); mkSlices()
     }
@@ -78,8 +82,9 @@ export default function App() {
     }
     function logoTex() {
       const mob = MOB(), ar = logo.naturalWidth / logo.naturalHeight
-      let lw = W * (mob ? .4 : .36), lh = lw / ar; const hMax = H * (mob ? .17 : .22); if (lh > hMax) { lh = hMax; lw = lh * ar }
-      const lx = (W - lw) / 2, ly = mob ? 78 * S : (H - lh) / 2 - H * .07
+      let lw = W * (mob ? .32 : .18), lh = lw / ar; const hMax = H * (mob ? .13 : .11); if (lh > hMax) { lh = hMax; lw = lh * ar }
+      const lx = mob ? (W - lw) / 2 + W * .06 : (W - lw) / 2 + W * .1
+      const ly = mob ? (W * .7725 + 42) - lh / 2 : (H - lh) / 2 - H * .07
       const o = {}
       for (const [c, col] of [['R', '#ff0000'], ['G', '#00ff00'], ['B', '#0000ff']]) {
         const cv = document.createElement('canvas'); cv.width = W; cv.height = H; const x = cv.getContext('2d')
@@ -245,11 +250,13 @@ export default function App() {
       if (!alive) return
       const fadeAmt = freeze > 0 ? 0 : (P.sp > 25 ? .14 : .4)
       if (pv) {
+        lgx.clearRect(0, 0, W, H)
         if (freeze <= 0) { scene(pv.i, t); drawTex(tex(pv.t.title), 'difference') }
         if (freeze <= 0 && tcRef.current) tcRef.current.textContent = tcode(t - pv.s) + ' / 00:' + pv.t.d
       } else {
         if (fadeAmt > 0) { hx.globalAlpha = fadeAmt; hx.fillStyle = BASE; hx.fillRect(0, 0, W, H); hx.globalAlpha = 1 }
         bx.clearRect(0, 0, W, H); drawTex(mainTex, 'lighter', bx); hx.drawImage(buf, 0, 0)
+        lgx.clearRect(0, 0, W, H); lgx.drawImage(buf, 0, 0)
         if (freeze <= 0 && tcRef.current) tcRef.current.textContent = tcode(t - t0)
       }
       if (!RM) { if (Math.random() < .05 + burst * .5) blocks(ri(1, 4 + burst * 10 | 0)); dripStep() }
@@ -288,37 +295,56 @@ export default function App() {
   return (
     <>
       <canvas id="hero" ref={heroRef} role="img" aria-label="Dengesiz Herifler logosu" />
+      <img className="band-photo band-photo-fixed" src={bandUrl} alt="Dengesiz Herifler stüdyoda" />
+      <canvas id="logo" ref={logoRef} aria-hidden="true" />
       <canvas id="fx" ref={fxRef} aria-hidden="true" />
 
       <main className="ui" ref={rootRef}>
         <h1 className="sr">Dengesiz Herifler</h1>
         <header className="top">
           <div>
-            <p data-scr>Ska / Punk / Reggae</p>
-            <p data-scr>This is Angara!</p>
+            <p data-scr>Dengesiz Herifler, Ska/Punk/Reggae</p>
           </div>
           <div className="r">
             <p id="tc" ref={tcRef} aria-hidden="true">00:00:00:00</p>
-            <p data-scr>Angara, 2005</p>
+            <p data-scr>çağ, mustafa, eren</p>
           </div>
         </header>
         <div className="spacer" aria-hidden="true" />
+        <img className="band-photo band-photo-flow" src={bandUrl} alt="Dengesiz Herifler stüdyoda" />
 
 
-        <section className="info" aria-labelledby="h-g">
-          <h2 id="h-g">Grup</h2>
-          <dl>
-            <dt>Kadro</dt><dd data-scr>eren, doa, mustafa</dd>
-            <dt>Görüntülenme</dt><dd id="views" ref={viewsRef}></dd>
-          </dl>
+        <section className="shows" aria-labelledby="h-s">
+          <h2 id="h-s">Konserler</h2>
+          <ol>
+            <li><a className="show" href="https://www.bubilet.com.tr/ankara/etkinlik/dengesiz-herifler" target="_blank" rel="noopener">
+              <span className="dt"><span className="d">1</span><span className="m">Ekim</span><span className="y">'26</span></span>
+              <span className="loc"><span className="cty"><svg className="ic" aria-hidden="true"><use href="/icons.svg#ticket-icon" /></svg><span className="c">Ankara</span></span><span className="v">SoldOut Performance Hall</span></span>
+            </a></li>
+            <li><a className="show" href="https://www.bubilet.com.tr/eskisehir/etkinlik/dengesiz-herifler" target="_blank" rel="noopener">
+              <span className="dt"><span className="d">15</span><span className="m">Ekim</span><span className="y">'26</span></span>
+              <span className="loc"><span className="cty"><svg className="ic" aria-hidden="true"><use href="/icons.svg#ticket-icon" /></svg><span className="c">Eskişehir</span></span><span className="v">F/Stop Salon</span></span>
+            </a></li>
+            <li><a className="show" href="https://www.bubilet.com.tr/izmir/etkinlik/dengesiz-herifler" target="_blank" rel="noopener">
+              <span className="dt"><span className="d">18</span><span className="m">Ekim</span><span className="y">'26</span></span>
+              <span className="loc"><span className="cty"><svg className="ic" aria-hidden="true"><use href="/icons.svg#ticket-icon" /></svg><span className="c">İzmir</span></span><span className="v">SoldOut Performance Hall</span></span>
+            </a></li>
+            <li><a className="show" href="https://www.bubilet.com.tr/istanbul/etkinlik/dengesiz-herifler" target="_blank" rel="noopener">
+              <span className="dt"><span className="d">10</span><span className="m">Kasım</span><span className="y">'26</span></span>
+              <span className="loc"><span className="cty"><svg className="ic" aria-hidden="true"><use href="/icons.svg#ticket-icon" /></svg><span className="c">İstanbul</span></span><span className="v">Blind</span></span>
+            </a></li>
+          </ol>
+        </section>
+
+        <section className="info">
+          <p className="contact"><a href="mailto:hey@dengesizherifler.com"><svg className="ic" aria-hidden="true"><use href="/icons.svg#envelope-icon" /></svg>hey@dengesizherifler.com</a></p>
           <p className="links">
-            <a href="https://open.spotify.com/artist/5wR7ZD67JNA7TYsiycE32o" target="_blank" rel="noopener"><svg className="ic" aria-hidden="true"><use href="/icons.svg#spotify-icon" /></svg><span>Spotify</span></a>
-            <a href="https://music.youtube.com/channel/UCTvWgmmdWiqjkx2P8aq2P0Q" target="_blank" rel="noopener"><svg className="ic" aria-hidden="true"><use href="/icons.svg#youtube-music-icon" /></svg><span>YouTube Music</span></a>
-            <a href="https://music.apple.com/tr/artist/dengesiz-herifler/968509395" target="_blank" rel="noopener"><svg className="ic" aria-hidden="true"><use href="/icons.svg#apple-music-icon" /></svg><span>Apple Music</span></a>
-            <a href="https://www.instagram.com/dengesiz.herifler/" target="_blank" rel="noopener"><svg className="ic" aria-hidden="true"><use href="/icons.svg#instagram-icon" /></svg><span>Instagram</span></a>
-            <a href="https://web.archive.org/web/2008/http://www.myspace.com/dengesizherifler" target="_blank" rel="noopener">myspace.com/dengesizherifler</a>
-            <a href="https://web.archive.org/web/2008/http://herkesdinlesin.com/dengesizherifler" target="_blank" rel="noopener">herkesdinlesin.com</a>
+            <a href="https://open.spotify.com/artist/5wR7ZD67JNA7TYsiycE32o" target="_blank" rel="noopener" aria-label="Spotify"><svg className="ic" aria-hidden="true"><use href="/icons.svg#spotify-icon" /></svg><span className="lbl">Spotify</span></a>
+            <a href="https://music.youtube.com/channel/UCTvWgmmdWiqjkx2P8aq2P0Q" target="_blank" rel="noopener" aria-label="YouTube Music"><svg className="ic" aria-hidden="true"><use href="/icons.svg#youtube-music-icon" /></svg><span className="lbl">YouTube Music</span></a>
+            <a href="https://music.apple.com/tr/artist/dengesiz-herifler/968509395" target="_blank" rel="noopener" aria-label="Apple Music"><svg className="ic" aria-hidden="true"><use href="/icons.svg#apple-music-icon" /></svg><span className="lbl">Apple Music</span></a>
+            <a href="https://www.instagram.com/dengesiz.herifler/" target="_blank" rel="noopener" aria-label="Instagram"><svg className="ic" aria-hidden="true"><use href="/icons.svg#instagram-icon" /></svg><span className="lbl">Instagram</span></a>
           </p>
+          <p className="copy"><svg className="ic" aria-hidden="true"><use href="/icons.svg#copyright-icon" /></svg><span>2003–2026 Dengesiz Herifler. All rights reserved.</span></p>
         </section>
       </main>
     </>
