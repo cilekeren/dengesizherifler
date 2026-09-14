@@ -38,9 +38,9 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;text-align:
 
 .top{grid-column:1/-1;display:flex;justify-content:space-between;align-items:flex-start}
 .top .r{text-align:right}
-#tc{font-variant-numeric:tabular-nums;font-weight:600}
+#tc{font-variant-numeric:tabular-nums}
 
-h2{font-weight:600;font-size:14px;margin-bottom:10px!important}
+h2{font-size:14px;font-weight:400;margin-bottom:10px!important;text-transform:uppercase}
 
 .shows{grid-row:3;grid-column:1;align-self:end;width:min(100%,460px)}
 .shows ol{list-style:none;padding:0;margin:0}
@@ -65,10 +65,11 @@ h2{font-weight:600;font-size:14px;margin-bottom:10px!important}
 .links .ic{width:14px;height:14px;flex:0 0 auto}
 .contact{margin-top:10px!important;text-align:right}
 @media (min-width:761px){.contact{position:absolute;right:20px;top:calc(17% + min(76vw,920px) * .5625);margin-top:0!important}}
+.contact-label{display:block;margin-bottom:4px}
 .contact a{display:inline-flex;align-items:center;gap:6px;border-bottom:1px solid currentColor}
 .contact a:hover{background:var(--ink);color:var(--base);border-color:transparent}
 .contact .ic{width:14px;height:14px;flex:0 0 auto}
-.copy{margin-top:10px!important;font-size:10px;opacity:.5;display:flex;align-items:center;justify-content:flex-end;gap:5px}
+.copy{margin-top:10px!important;opacity:.5;display:flex;align-items:center;justify-content:flex-end;gap:5px}
 .copy span{min-width:0}
 .copy .ic{width:11px;height:11px;flex:0 0 auto}
 #views{font-variant-numeric:tabular-nums}
@@ -76,21 +77,30 @@ h2{font-weight:600;font-size:14px;margin-bottom:10px!important}
 .jit{transform:translateX(var(--jx,6px));clip-path:inset(var(--jc,20%) 0 0 0)}
 
 @media (max-width:760px){
-  body{overflow:auto}
-  .ui{position:relative;min-height:100%;display:flex;flex-direction:column;gap:28px;padding:14px 14px 170px}
+  html,body{height:100%}
+  body{overflow:hidden}
+  .ui{position:fixed;inset:0;height:100vh;height:100dvh;overflow:hidden;display:flex;flex-direction:column;gap:clamp(6px,2vh,16px);padding:clamp(8px,2.5vh,14px) 14px clamp(6px,2vh,12px)}
   .top{flex:0 0 auto}
-  .spacer{flex:0 0 calc(37vw - 10px)}
+  .spacer{display:none}
   .shows,.info{max-width:none;width:100%;justify-self:auto}
   .row .t{font-size:20px}
-  .band-photo{margin-top:-22vw}
+  .band-photo-flow{flex:0 1 auto;aspect-ratio:16/9;min-height:0;width:100%;height:auto;margin-top:0;object-fit:contain;object-position:center}
   #logo{z-index:4}
+  .shows{flex:0 0 auto;margin-top:14px}
   .show{grid-template-columns:96px 1fr}
   .show .y{margin-left:-8px}
   .show .v{white-space:nowrap;margin-left:-10px}
-  .info{position:fixed;left:14px;right:14px;bottom:0;background:var(--base);z-index:10;padding:12px 0 20px;display:flex;flex-direction:column;gap:30px}
-  .links{position:static;margin:0!important;flex-direction:column;align-items:flex-start}
-  .copy{justify-content:flex-start;margin:0!important}
+  .info{flex:0 0 auto;margin-top:auto;padding:20px 0 0;display:grid;grid-template-columns:1fr auto;column-gap:16px;row-gap:6px;align-items:end}
+  .links{display:contents}
+  .links a{grid-column:1/-1;justify-self:start}
+  .links a:nth-child(1){order:1}
+  .links a:nth-child(2){order:2}
+  .links a:nth-child(3){order:3;grid-column:1}
+  .links a:nth-child(4){order:5;grid-column:1}
+  .copy{justify-content:center;margin:10px 0 0!important;order:7;grid-column:1/-1;border-top:1px dotted rgba(255,255,255,.5);padding-top:10px}
   .copy span{white-space:normal}
-  .contact{text-align:left;margin:0!important}
+  .contact{display:contents}
+  .contact-label{order:4;grid-column:2;justify-self:end;text-align:right;margin-bottom:0}
+  .contact a{order:6;grid-column:2;justify-self:end}
 }
 @media (min-width:761px){.spacer{display:none}}

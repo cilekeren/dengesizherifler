@@ -28,6 +28,8 @@ export default function App() {
   const heroRef = useRef(null)
   const fxRef = useRef(null)
   const logoRef = useRef(null)
+  const photoRef = useRef(null)
+  const photoFixedRef = useRef(null)
   const tcRef = useRef(null)
   const viewsRef = useRef(null)
   const rowRefs = useRef([])
@@ -82,9 +84,30 @@ export default function App() {
     }
     function logoTex() {
       const mob = MOB(), ar = logo.naturalWidth / logo.naturalHeight
-      let lw = W * (mob ? .32 : .18), lh = lw / ar; const hMax = H * (mob ? .13 : .11); if (lh > hMax) { lh = hMax; lw = lh * ar }
-      const lx = mob ? (W - lw) / 2 + W * .06 : (W - lw) / 2 + W * .1
-      const ly = mob ? (W * .7725 + 42) - lh / 2 : (H - lh) / 2 - H * .07
+      let lw, lh, lx, ly
+      if (mob && photoRef.current) {
+        const r = photoRef.current.getBoundingClientRect()
+        lw = r.width * .26; lh = lw / ar
+        const hMax = r.height * .42; if (lh > hMax) { lh = hMax; lw = lh * ar }
+        lx = (r.left + (r.width - lw) / 2) * S
+        /* logo straddles the photo's bottom edge: 50% of its height overlaps the photo */
+        ly = ((r.top + r.height) * S) - lh / 2
+      } else if (mob) {
+        lw = W * .32; lh = lw / ar; const hMax = H * .13; if (lh > hMax) { lh = hMax; lw = lh * ar }
+        lx = (W - lw) / 2 + W * .06
+        ly = H * .5 - lh / 2
+      } else if (photoFixedRef.current) {
+        const r = photoFixedRef.current.getBoundingClientRect()
+        lw = r.width * .28; lh = lw / ar
+        const hMax = r.height * .55; if (lh > hMax) { lh = hMax; lw = lh * ar }
+        /* logo straddles the photo's right edge: 50% of its width overlaps the photo */
+        lx = ((r.left + r.width) * S) - lw / 2
+        ly = (r.top + r.height / 2) * S - lh / 2
+      } else {
+        lw = W * .18; lh = lw / ar; const hMax = H * .11; if (lh > hMax) { lh = hMax; lw = lh * ar }
+        lx = (W - lw) / 2 + W * .1
+        ly = (H - lh) / 2 - H * .07
+      }
       const o = {}
       for (const [c, col] of [['R', '#ff0000'], ['G', '#00ff00'], ['B', '#0000ff']]) {
         const cv = document.createElement('canvas'); cv.width = W; cv.height = H; const x = cv.getContext('2d')
@@ -266,8 +289,15 @@ export default function App() {
       rafId = requestAnimationFrame(frame)
     }
 
-    let rT
-    const onResize = () => { clearTimeout(rT); rT = setTimeout(size, 120) }
+    /* resize on the next frame, not a fixed debounce — the logo is baked into a
+       canvas texture keyed to the photo's live position, so any lag here reads
+       as the logo and photo drifting apart during resize/orientation change */
+    let resizeQueued = false
+    const onResize = () => {
+      if (resizeQueued) return
+      resizeQueued = true
+      requestAnimationFrame(() => { resizeQueued = false; size() })
+    }
     addEventListener('resize', onResize)
 
     const ready = document.fonts && document.fonts.load
@@ -283,7 +313,6 @@ export default function App() {
       removeEventListener('pointermove', onPointerMove)
       removeEventListener('pointerdown', onPointerDown)
       removeEventListener('resize', onResize)
-      clearTimeout(rT)
       if (rafId) cancelAnimationFrame(rafId)
       timers.forEach(id => clearTimeout(id))
       scrHandlers.forEach(([el, h]) => el.removeEventListener('pointerenter', h))
@@ -295,7 +324,7 @@ export default function App() {
   return (
     <>
       <canvas id="hero" ref={heroRef} role="img" aria-label="Dengesiz Herifler logosu" />
-      <img className="band-photo band-photo-fixed" src={bandUrl} alt="Dengesiz Herifler stüdyoda" />
+      <img className="band-photo band-photo-fixed" ref={photoFixedRef} src={bandUrl} alt="Dengesiz Herifler stüdyoda" />
       <canvas id="logo" ref={logoRef} aria-hidden="true" />
       <canvas id="fx" ref={fxRef} aria-hidden="true" />
 
@@ -311,7 +340,7 @@ export default function App() {
           </div>
         </header>
         <div className="spacer" aria-hidden="true" />
-        <img className="band-photo band-photo-flow" src={bandUrl} alt="Dengesiz Herifler stüdyoda" />
+        <img className="band-photo band-photo-flow" ref={photoRef} src={bandUrl} alt="Dengesiz Herifler stüdyoda" />
 
 
         <section className="shows" aria-labelledby="h-s">
@@ -337,7 +366,7 @@ export default function App() {
         </section>
 
         <section className="info">
-          <p className="contact"><a href="mailto:hey@dengesizherifler.com"><svg className="ic" aria-hidden="true"><use href="/icons.svg#envelope-icon" /></svg>hey@dengesizherifler.com</a></p>
+          <p className="contact"><span className="contact-label">İLETİŞİM VE BOOKING</span><a href="mailto:hey@dengesizherifler.com"><svg className="ic" aria-hidden="true"><use href="/icons.svg#envelope-icon" /></svg>hey@dengesizherifler.com</a></p>
           <p className="links">
             <a href="https://open.spotify.com/artist/5wR7ZD67JNA7TYsiycE32o" target="_blank" rel="noopener" aria-label="Spotify"><svg className="ic" aria-hidden="true"><use href="/icons.svg#spotify-icon" /></svg><span className="lbl">Spotify</span></a>
             <a href="https://music.youtube.com/channel/UCTvWgmmdWiqjkx2P8aq2P0Q" target="_blank" rel="noopener" aria-label="YouTube Music"><svg className="ic" aria-hidden="true"><use href="/icons.svg#youtube-music-icon" /></svg><span className="lbl">YouTube Music</span></a>
