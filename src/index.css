@@ -3,6 +3,10 @@
   --base:#0000aa;   /* çökme mavisi */
   --ink:#ffffff;
   --mag:#ff00ff; --grn:#00ff00; --cyn:#00ffff;
+  /* band photo width: capped by viewport width as usual, but also by viewport
+     height so short windows shrink it instead of letting it run into the
+     shows/info block pinned to the bottom */
+  --photo-w:min(76vw,920px,calc((83vh - 160px) / .5625));
 }
 *{box-sizing:border-box}
 html,body{margin:0;height:100%;background:var(--base);color:var(--ink)}
@@ -21,7 +25,7 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;text-align:
 .band-photo{width:100%;border-radius:2px;filter:grayscale(1) contrast(1.25)}
 .band-photo-fixed{display:none}
 @media (min-width:761px){
-  .band-photo-fixed{display:block;position:fixed;z-index:1;left:20px;top:17%;width:min(76vw,920px);pointer-events:none}
+  .band-photo-fixed{display:block;position:fixed;z-index:1;left:20px;top:17%;width:var(--photo-w);pointer-events:none}
   .band-photo-flow{display:none}
 }
 
@@ -64,9 +68,13 @@ h2{font-size:14px;font-weight:400;margin-bottom:10px!important;text-transform:up
 .links a:hover{background:var(--ink);color:var(--base);border-color:transparent}
 .links .ic{width:14px;height:14px;flex:0 0 auto}
 .contact{margin-top:10px!important;text-align:right}
-@media (min-width:761px){.contact{position:absolute;right:20px;top:calc(17% + min(76vw,920px) * .5625);margin-top:0!important}}
+@media (min-width:761px){.contact{position:absolute;right:20px;top:auto;bottom:calc(83% - var(--photo-w) * .5625);margin-top:0!important}}
 .contact-label{display:block;margin-bottom:4px}
 .contact a{display:inline-flex;align-items:center;gap:6px;border-bottom:1px solid currentColor}
+/* inline-flex leaves half-leading below it from the paragraph's line box, so the
+   visible link — not just the <p>'s box — sits a couple px above the intended edge;
+   make it a block-level fit-content box so its own bottom border is the true edge */
+@media (min-width:761px){.contact a{display:flex;width:max-content;margin-left:auto}}
 .contact a:hover{background:var(--ink);color:var(--base);border-color:transparent}
 .contact .ic{width:14px;height:14px;flex:0 0 auto}
 .copy{margin-top:10px!important;opacity:.5;display:flex;align-items:center;justify-content:flex-end;gap:5px}
